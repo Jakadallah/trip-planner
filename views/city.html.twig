@@ -1,0 +1,53 @@
+{%  include 'inc/head-tag.html.twig' %}
+{%  include 'inc/navbar.html.twig' %}
+<html>
+<body>
+    <div class='row main-search'>
+        <div class='container'>
+            <form class='form-inline' action="/search_results" method="post">
+                <button class='magnifying-main' type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
+                <input type="text" class="form-control input-lg search-bar-main" name="search_input" placeholder="Search cities">
+           </form>
+        </div>
+    </div>
+    <div class='container'>
+        <div class='search-back'><a href='/search_results/back'><< Back</a></div>
+        <div class='row'>
+            <div class='col-sm-3'>
+                <img class='city-pic' src='/assets/img/cityscape.svg'>
+                <h1>{{ city.getName }}</h1>
+                <h4>{{ city.getState }}</h4>
+            </div>
+            <div class='col-sm-9'>
+                <h3>Reviews for {{ city.getName }}</h3>
+                {% if city.getReviews is not empty %}
+                    {% for review in city.getReviews %}
+                    <div class='well row review-well'>
+                        <div class='col-xs-2 text-center'>
+                            <img class="user-pic-small" src="/assets/img/user.svg">
+                            <h5>{{ review.getUsername }}</h5>
+                        </div>
+                        <div class='col-xs-10'>
+                            <h4><a href="/past_trip/{{ review.getTripId }}">{{ review.getTitle }}</a></h4>
+                            <p>
+                                {% for i in 1..review.getRating %}
+                                    <img class="star-rating" src="/assets/img/star-gold.svg">
+                                {% endfor %}
+                                {% if review.getRating < 5 %}
+                                    {% for i in 1..5-review.getRating %}
+                                        <img class="star-rating" src="/assets/img/star-empty.svg">
+                                    {% endfor %}
+                                {% endif %}
+                                <span class="star-rating">{{ review.getRating }}</span>
+                            </p>
+                            <p>{{ review.getDescription }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% include 'inc/footer.html' %}
+</body>
+</html>
