@@ -1,0 +1,30 @@
+{%  include 'inc/head-tag.html.twig' %}
+{%  include 'inc/navbar.html.twig' %}
+<html>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2">
+                <ul class="nav nav-pills nav-stacked">
+                    <li role="presentation"><a href="/dashboard/{{ user.getId }}"><span class='sidebar'>Home</span></a></li>
+                    <li role="presentation"><a href="/pending_trips/{{ user.getId }}"><span class="sidebar">Pending Trips</span></a></li>
+                    <li role="presentation"><a href="/past_trips/{{ user.getId }}"><span class='sidebar'>Past Trips</span></a></li>
+                    <li role="presentation"><a href="/new_trip/{{ user.getId }}"><span class='sidebar-active'>New Trip</span></a></li>
+                </ul>
+            </div>
+            <div class="col-sm-10">
+                <form class='sign-up-form' action="/new_trip/{{user.getId}}" method="post">
+                    <h2 class='text-center'>Begin a New Journey!</h2>
+                    <br>
+                    <input class="form-control" name="purpose" placeholder="What is this trip for?" type="text" required>
+                    <br>
+                    <textarea class="form-control" name="description" placeholder="Trip description" type="text"></textarea>
+                    <br>
+                    <button type="submit" class="btn btn-info center-block">Add Trip</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% include 'inc/footer.html' %}
+</body>
+</html>
