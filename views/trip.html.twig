@@ -1,0 +1,241 @@
+{%  include 'inc/head-tag.html.twig' %}
+{%  include 'inc/navbar_nopic.html.twig' %}
+<html>
+<body>
+    <div class="container">
+        <div class='row'>
+            <div class="col-sm-2">
+                <ul class="nav nav-pills nav-stacked">
+                    <li role="presentation"><a href="/dashboard/{{ user.getId }}"><span class='sidebar'>Home</span></a></li>
+                    <li role="presentation"><a href="/pending_trips/{{ user.getId }}"><span class="sidebar-active">Pending Trips</span></a></li>
+                    <li role="presentation"><a href="/past_trips/{{ user.getId }}"><span class='sidebar'>Past Trips</span></a></li>
+                    <li role="presentation"><a href="/new_trip/{{ user.getId }}"><span class='sidebar'>New Trip</span></a></li>
+                </ul>
+            </div>
+            <br>
+            <h1>{{ trip.getName }}</h1>
+            <h5>{{ trip.getDescription }}</h5>
+            <!-- <div class='col-md-10'> -->
+            <!-- <div class="row"> -->
+            <div class="col-sm-5">
+                {% if activities is not empty %}
+                    <h3>Trip Itinerary</h3>
+                    {% for activity in activities %}
+                        <div class='well'>
+                            <h3 class='new-h3-size'>{{ activity.getName }}</h3>
+                            <p class='pull-right'>{{ activity.getDate|date('m/d/Y @ h:m A') }}</p>
+                            <p>{{ activity.getDescription }}</p>
+                            {% if current_user == user  %}
+                                <a class='show-form edit'>(Edit this activity)</a>
+                                <div class='hidden-form'>
+                                    <hr>
+                                    <form action='/trip/{{ trip.getId }}/{{activity.getId}}' method='post'>
+                                        <input type='hidden' name='_method' value='patch'>
+                                        <h3>Edit this activity</h3>
+                                        <div class='form-group'>
+                                            <input type='text' name='name' class='form-control' value='{{ activity.getName }}' placeholder='Name'>
+                                        </div>
+                                        <div class='form-group'>
+                                            <input type='datetime-local' name='date' class='form-control' value='{{ activity.getDate }}'>
+                                        </div>
+                                        <div class='form-group'>
+                                            <textarea name='description' class='form-control' placeholder='Description'>{{ activity.getDescription }}</textarea>
+                                        </div>
+                                        <button class='btn btn-info' type='submit'>Edit</button>
+                                    </form>
+                                    <form action='/trip/{{ trip.getId }}' method='post'>
+                                        <input type="hidden" name="_method" value="delete">
+                                        <input type='hidden' name='activity_id' value='{{ activity.getId }}'>
+                                        <button type='submit' class='trash pull-right'><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                <!-- <a class='center-block add_activity_button'><p>Add an activity</p></a> -->
+                <div class='add_activity'>
+                    {% if current_user == user  %}
+                        <form method='post' action='/trip/{{ trip.getId }}'>
+                            <h3>Add an activity to this trip</h3>
+                            <div class='form-group'>
+                                <input type='text' name='name' class='form-control' placeholder='Name'>
+                            </div>
+                            <div class='form-group'>
+                                <input type='datetime-local' name='date' class='form-control' value='2016-01-01T12:00'>
+                            </div>
+                            <div class='form-group'>
+                                <textarea name='description' class='form-control' placeholder='Description'></textarea>
+                            </div>
+                            <button class='btn btn-info center-block' type='submit'>Add</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- </div> -->
+            <div class='col-md-4 col-sm-offset-1 cities '>
+                {% if trip_cities is not empty %}
+                    <h3>Cities</h3>
+                    <div class="well past_cities">
+                        <ul>
+                        {% for city in trip_cities %}
+                            <li class='spaced-list'>
+                                {{ city.getName }}, {{ city.getState }}
+                                {% if current_user == user %}
+                                    <form class='inline' action='/trip/remove_city/{{ trip.getId }}' method='post'>
+                                        <input type="hidden" name="_method" value="delete">
+                                        <input type="hidden" name="city_id" value="{{ city.getId }}">
+                                        <button class='trash' type='submit'><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                                    </form>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                <h3>Add a city to this trip</h3>
+                <div class="add_city">
+                    {% if current_user == user  %}
+                        {% if all_cities is not empty %}
+                            <form method='post' action='/trip/city/{{ trip.getId }}'>
+                                <select name='city_id' class='form-control'>
+                                    <option active>Select a City</option>
+                                    {% for city in all_cities %}
+                                        <option value='{{ city.getId }}'>{{ city.getName }}, {{ city.getState }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button class='btn btn-info center-block' type='submit'>Add</button>
+                            </form>
+                    {% endif %}
+                </div>
+                <!-- form for adding cities - not done -->
+                <br>
+                <a class='add_new_form_button show-form'><p>Can't find your city? Add a new one!</p></a>
+                <div class='hidden-form hidden_city'>
+                    <form method='post' action='/trip/new_city/{{ trip.getId }}'>
+                        <input name='name' type='text' class='form-control' placeholder="City Name">
+                        <br>
+                        <select class='form-control' name="state">
+                            <option value="State" active>State</option>
+                            <option value="Alabama">Alabama</option>
+                            <option value="Alaska">Alaska</option>
+                            <option value="Arizona">Arizona</option>
+                            <option value="Arkansas">Arkansas</option>
+                            <option value="California">California</option>
+                            <option value="Colorado">Colorado</option>
+                            <option value="Connecticut">Connecticut</option>
+                            <option value="Delaware">Delaware</option>
+                            <option value="District of Columbia">District of Columbia</option>
+                            <option value="Florida">Florida</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Hawaii">Hawaii</option>
+                            <option value="Idaho">Idaho</option>
+                            <option value="Illinois">Illinois</option>
+                            <option value="Indiana">Indiana</option>
+                            <option value="Iowa">Iowa</option>
+                            <option value="Kansas">Kansas</option>
+                            <option value="Kentucky">Kentucky</option>
+                            <option value="Louisiana">Louisiana</option>
+                            <option value="Maine">Maine</option>
+                            <option value="Maryland">Maryland</option>
+                            <option value="Massachusetts">Massachusetts</option>
+                            <option value="Michigan">Michigan</option>
+                            <option value="Minnesota">Minnesota</option>
+                            <option value="Mississippi">Mississippi</option>
+                            <option value="Missouri">Missouri</option>
+                            <option value="Montana">Montana</option>
+                            <option value="Nebraska">Nebraska</option>
+                            <option value="Nevada">Nevada</option>
+                            <option value="New Hampshire">New Hampshire</option>
+                            <option value="New Jersey">New Jersey</option>
+                            <option value="New Mexico">New Mexico</option>
+                            <option value="New York">New York</option>
+                            <option value="North Carolina">North Carolina</option>
+                            <option value="North Dakota">North Dakota</option>
+                            <option value="Ohio">Ohio</option>
+                            <option value="Oklahoma">Oklahoma</option>
+                            <option value="Oregon">Oregon</option>
+                            <option value="Pennsylvania">Pennsylvania</option>
+                            <option value="Rhode Island">Rhode Island</option>
+                            <option value="South Carolina">South Carolina</option>
+                            <option value="South Dakota">South Dakota</option>
+                            <option value="Tennessee">Tennessee</option>
+                            <option value="Texas">Texas</option>
+                            <option value="Utah">Utah</option>
+                            <option value="Vermont">Vermont</option>
+                            <option value="Virginia">Virginia</option>
+                            <option value="Washington">Washington</option>
+                            <option value="West Virginia">West Virginia</option>
+                            <option value="Wisconsin">Wisconsin</option>
+                            <option value="Wyoming">Wyoming</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <button class='btn btn-info center-block' type='submit'>Add</button>
+                    </form>
+                </div>
+                {% endif %}
+                    <!-- beginning of trip review section- still needs more work in routing -->
+                <hr>
+                    <!-- Add a review form -->
+                {% if current_user == user and trip.getComplete == 0 and trip_cities is not empty and activities is not empty %}
+                    <button class='btn-review btn btn-info show-review-form center-block'>Review this trip</button>
+                {% endif %}
+                <br>
+                {% if current_user == user %}
+                    <div class="well review_form">
+                        <form action='/review_form/{{ trip.getId }}' method='post'>
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            <h3>Review your experience:</h3>
+                            <input type='text' name='title' class='form-control' placeholder='Title' required>
+                            <div class='form-group rate-review'>
+                                <label class='rating-label' for='title'>Overall rating:</label>
+                                <label class="radio-inline rating-form-label"><input class='rating-radio' type="radio" name="rating" value='1'><img id='star-one' class="star-rating" src="/assets/img/star-empty.svg"></label>
+                                <label class="radio-inline rating-form-label"><input class='rating-radio' type="radio" name="rating" value='2'><img id='star-two' class="star-rating" src="/assets/img/star-empty.svg"></label>
+                                <label class="radio-inline rating-form-label"><input class='rating-radio' type="radio" name="rating" value='3'><img id='star-three' class="star-rating" src="/assets/img/star-empty.svg"></label>
+                                <label class="radio-inline rating-form-label"><input class='rating-radio' type="radio" name="rating" value='4'><img id='star-four' class="star-rating" src="/assets/img/star-empty.svg"></label>
+                                <label class="radio-inline rating-form-label"><input class='rating-radio' type="radio" name="rating" value='5'><img id='star-five' class="star-rating" src="/assets/img/star-empty.svg"></label>
+                            </div>
+                            <textarea name='description' class='form-control' placeholder='Description' required></textarea>
+                            <button class='btn btn-info' type='submit'>Submit</button>
+                        </form>
+                    </div>
+                    <form action='/trip/delete/{{trip.getId}}' method='post'>
+                        <input type="hidden" name="_method" value="delete">
+                        <button type='submit' class='trash centered'>Delete this Trip</button>
+                    </form>
+                {% endif %}
+                    <!-- end of add a review form -->
+                    <!-- start of show/edit reviews -->
+                {% if review is not empty %}
+                    {% if current_user == user  %}
+                        <div class="well reviews">
+                            <h4>Your review:</h4>
+                            <h5>{{ review.getTitle }} - <span>{{ review.getRating }} stars</span></h5>
+                            <p>{{ review.getDescription }}</p>
+                        </div>
+                        <div class='hidden-form edit-review'>
+                            <hr>
+                            <form action='/trip/{{ trip.getId }}' method='post'>
+                                <input type='hidden' name='_method' value='patch'>
+                                <h3>Edit this review</h3>
+                                <label for='title'>Review Title</label>
+                                <input type='text' name='title' class='form-control' value='{{ review.getTitle }}'>
+                                <label for='description'>Description</label>
+                                <textarea name='description' class='form-control'>{{ review.getDescription }}</textarea>
+                                <button class='btn btn-info' type='submit'>Edit</button>
+                            </form>
+                        </div>
+                        {% else %}
+                            <div class="well reviews">
+                                <h4>{{ user.getUsername }}'s review:</h4>
+                                <h5>{{ review.getTitle }} - <span>{{ review.getRating }} stars</span></h5>
+                                <p>{{ review.getDescription }}</p>
+                            </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% include 'inc/footer.html' %}
+</body>
+</html>
